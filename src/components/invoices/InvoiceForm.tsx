@@ -1,40 +1,117 @@
 
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent } from '@/components/ui/card';
-import { useNavigate } from 'react-router-dom';
+import { format } from 'date-fns';
+import { Plus, Minus } from 'lucide-react';
+
+type InvoiceItem = {
+  id: string;
+  description: string;
+  quantity: number;
+  unitPrice: number;
+};
+
+type InvoiceFormData = {
+  customerName: string;
+  customerAddress: string;
+  customerCity: string;
+  customerRegNumber: string;
+  customerVat: string;
+  invoiceNumber: string;
+  issueDate: string;
+  dueDate: string;
+  notes: string;
+  yourCompanyName: string;
+  yourCompanyAddress: string;
+  yourBankAccount: string;
+  yourIban: string;
+  yourBic: string;
+  yourBank: string;
+};
+
+const formatCurrency = (amount: number): string => {
+  return new Intl.NumberFormat('de-DE', {
+    style: 'currency',
+    currency: 'EUR',
+    minimumFractionDigits: 2,
+  }).format(amount);
+};
 
 const InvoiceForm: React.FC = () => {
   const navigate = useNavigate();
-  const form = useForm({
+  const today = format(new Date(), 'dd/MM/yyyy');
+  const nextMonth = format(new Date(new Date().setMonth(new Date().getMonth() + 1)), 'dd/MM/yyyy');
+  
+  const [items, setItems] = useState<InvoiceItem[]>([
+    {
+      id: '1',
+      description: '',
+      quantity: 1,
+      unitPrice: 0,
+    },
+  ]);
+
+  const form = useForm<InvoiceFormData>({
     defaultValues: {
-      customerName: '',
-      customerEmail: '',
-      customerAddress: '',
-      customerVat: '',
-      issueDate: new Date().toISOString().split('T')[0],
-      dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      itemDescription: '',
-      itemQuantity: 1,
-      itemUnitPrice: 0,
-      itemVat: 19,
-      notes: '',
+      invoiceNumber: 'INV-1016',
+      issueDate: today,
+      dueDate: nextMonth,
+      yourCompanyName: 'Adfinea OÜ',
+      yourCompanyAddress: 'Rannamõisa tee 5a',
+      yourBankAccount: 'Account holder: Adfinea OÜ',
+      yourIban: 'IBAN: EE4977007710046243399',
+      yourBic: 'BIC/SWIFT: LHVBEE22',
+      yourBank: 'Bank: AS LHV Pank',
     },
   });
 
-  const onSubmit = (data: any) => {
-    console.log('Form data submitted:', data);
+  const handleAddItem = () => {
+    setItems([
+      ...items,
+      {
+        id: `${items.length + 1}`,
+        description: '',
+        quantity: 1,
+        unitPrice: 0,
+      },
+    ]);
+  };
+
+  const handleRemoveItem = (id: string) => {
+    if (items.length > 1) {
+      setItems(items.filter(item => item.id !== id));
+    }
+  };
+
+  const handleChangeItem = (id: string, field: keyof InvoiceItem, value: string | number) => {
+    setItems(items.map(item => 
+      item.id === id ? { ...item, [field]: value } : item
+    ));
+  };
+
+  const calculateItemTotal = (item: InvoiceItem): number => {
+    return item.quantity * item.unitPrice;
+  };
+
+  const calculateSubtotal = (): number => {
+    return items.reduce((sum, item) => sum + calculateItemTotal(item), 0);
+  };
+
+  const calculateVat = (): number => {
+    // Assuming 0% VAT for now
+    return 0;
+  };
+
+  const calculateTotal = (): number => {
+    return calculateSubtotal() + calculateVat();
+  };
+
+  const onSubmit = (data: InvoiceFormData) => {
+    console.log('Form data submitted:', { ...data, items });
     // In a real app, we would save the invoice here
     
     // Navigate back to dashboard after mock submission
@@ -42,226 +119,224 @@ const InvoiceForm: React.FC = () => {
   };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Customer Information</h3>
-                
-                <FormField
-                  control={form.control}
-                  name="customerName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Customer Name</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Company or individual name" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="customerEmail"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input type="email" placeholder="customer@example.com" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="customerAddress"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Address</FormLabel>
-                      <FormControl>
-                        <Textarea placeholder="Customer address" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="customerVat"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>VAT Number</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g. DE123456789" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Invoice Details</h3>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="issueDate"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Issue Date</FormLabel>
-                        <FormControl>
-                          <Input type="date" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="dueDate"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Due Date</FormLabel>
-                        <FormControl>
-                          <Input type="date" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="pt-6">
-            <h3 className="text-lg font-semibold mb-4">Invoice Items</h3>
-            
-            <div className="space-y-4">
-              <FormField
-                control={form.control}
-                name="itemDescription"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Description</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Item or service description" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+    <form onSubmit={form.handleSubmit(onSubmit)} className="bg-white rounded-lg p-8 shadow-sm">
+      {/* Invoice Header */}
+      <div className="flex justify-between items-start mb-8">
+        <div>
+          <h1 className="text-3xl font-bold mb-4">Invoice</h1>
+          <div className="space-y-1 text-sm text-gray-600">
+            <div className="flex">
+              <span className="w-28">Invoice No:</span>
+              <Input 
+                {...form.register('invoiceNumber')}
+                className="h-6 p-0 border-0 bg-transparent focus-visible:ring-0 text-black" 
               />
-              
-              <div className="grid grid-cols-3 gap-4">
-                <FormField
-                  control={form.control}
-                  name="itemQuantity"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Quantity</FormLabel>
-                      <FormControl>
-                        <Input 
-                          type="number" 
-                          min="1" 
-                          {...field}
-                          onChange={(e) => field.onChange(parseInt(e.target.value) || 1)} 
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="itemUnitPrice"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Unit Price (€)</FormLabel>
-                      <FormControl>
-                        <Input 
-                          type="number" 
-                          step="0.01" 
-                          min="0" 
-                          {...field}
-                          onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="itemVat"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>VAT Rate (%)</FormLabel>
-                      <FormControl>
-                        <Input 
-                          type="number" 
-                          min="0" 
-                          max="100" 
-                          {...field}
-                          onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              
-              {/* In a real app, we would have functionality to add multiple items */}
-              <Button variant="outline" type="button" className="mt-2">
-                + Add Another Item
+            </div>
+            <div className="flex">
+              <span className="w-28">Issue Date:</span>
+              <Input 
+                {...form.register('issueDate')}
+                className="h-6 p-0 border-0 bg-transparent focus-visible:ring-0 text-black" 
+              />
+            </div>
+            <div className="flex">
+              <span className="w-28">Due Date:</span>
+              <Input 
+                {...form.register('dueDate')}
+                className="h-6 p-0 border-0 bg-transparent focus-visible:ring-0 text-black" 
+              />
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center">
+          <div className="text-2xl font-bold text-teal-600">
+            Pezito<span className="text-green-400">24</span>
+          </div>
+          <div className="ml-1 h-12 w-12 rounded-full border-4 border-yellow-300"></div>
+        </div>
+      </div>
+
+      {/* From/To Section */}
+      <div className="grid grid-cols-2 gap-8 mb-10">
+        <div>
+          <h2 className="text-sm text-gray-500 mb-2">From</h2>
+          <Input 
+            {...form.register('yourCompanyName')}
+            className="mb-1 h-7 border-0 p-0 bg-transparent focus-visible:ring-0 font-medium" 
+            placeholder="Your Company Name" 
+          />
+          <Input 
+            {...form.register('yourCompanyAddress')}
+            className="mb-1 h-7 border-0 p-0 bg-transparent focus-visible:ring-0" 
+            placeholder="Street Address" 
+          />
+          <Input 
+            className="mb-1 h-7 border-0 p-0 bg-transparent focus-visible:ring-0" 
+            placeholder="13516 Tallinn" 
+          />
+          <Input 
+            className="mb-1 h-7 border-0 p-0 bg-transparent focus-visible:ring-0" 
+            placeholder="Estonia" 
+          />
+          <div className="mt-3">
+            <div className="flex">
+              <span className="w-14 text-sm text-gray-500">Reg:</span>
+              <Input 
+                className="h-6 p-0 border-0 bg-transparent focus-visible:ring-0" 
+                placeholder="14882759" 
+              />
+            </div>
+            <div className="flex">
+              <span className="w-14 text-sm text-gray-500">VAT #:</span>
+              <Input 
+                {...form.register('customerVat')}
+                className="h-6 p-0 border-0 bg-transparent focus-visible:ring-0" 
+                placeholder="EE102231175" 
+              />
+            </div>
+          </div>
+        </div>
+        <div>
+          <h2 className="text-sm text-gray-500 mb-2">To</h2>
+          <div className="p-3 border border-dashed border-gray-300 bg-gray-50 rounded-md flex items-center justify-center h-32 text-gray-500 hover:bg-gray-100 cursor-pointer transition-colors">
+            Select customer
+          </div>
+        </div>
+      </div>
+
+      {/* Invoice Items */}
+      <div className="mb-8">
+        <div className="grid grid-cols-12 gap-4 mb-2 text-sm text-gray-500">
+          <div className="col-span-5">Description</div>
+          <div className="col-span-3 text-center">Quantity</div>
+          <div className="col-span-2 text-right">Price</div>
+          <div className="col-span-2 text-right">Total</div>
+        </div>
+        
+        {items.map((item, index) => (
+          <div key={item.id} className="grid grid-cols-12 gap-4 mb-4 items-center">
+            <div className="col-span-5">
+              <Input
+                value={item.description}
+                onChange={(e) => handleChangeItem(item.id, 'description', e.target.value)}
+                className="w-full"
+                placeholder="Item description"
+              />
+            </div>
+            <div className="col-span-3 flex items-center justify-center">
+              <Button 
+                type="button" 
+                variant="outline" 
+                size="icon" 
+                className="h-8 w-8 rounded-full"
+                onClick={() => handleChangeItem(item.id, 'quantity', Math.max(1, item.quantity - 1))}
+              >
+                <Minus className="h-3 w-3" />
+              </Button>
+              <Input
+                value={item.quantity}
+                onChange={(e) => handleChangeItem(item.id, 'quantity', parseInt(e.target.value) || 1)}
+                className="w-16 text-center mx-2"
+                type="number"
+                min="1"
+              />
+              <Button 
+                type="button" 
+                variant="outline" 
+                size="icon" 
+                className="h-8 w-8 rounded-full"
+                onClick={() => handleChangeItem(item.id, 'quantity', item.quantity + 1)}
+              >
+                <Plus className="h-3 w-3" />
               </Button>
             </div>
-          </CardContent>
-        </Card>
+            <div className="col-span-2">
+              <Input
+                value={item.unitPrice}
+                onChange={(e) => handleChangeItem(item.id, 'unitPrice', parseFloat(e.target.value) || 0)}
+                className="text-right"
+                type="number"
+                step="0.01"
+                min="0"
+              />
+            </div>
+            <div className="col-span-2 text-right font-mono">
+              {formatCurrency(calculateItemTotal(item))}
+            </div>
+          </div>
+        ))}
         
-        <Card>
-          <CardContent className="pt-6">
-            <FormField
-              control={form.control}
-              name="notes"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Notes</FormLabel>
-                  <FormControl>
-                    <Textarea 
-                      placeholder="Additional notes to customer (optional)" 
-                      className="h-24" 
-                      {...field} 
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </CardContent>
-        </Card>
-        
-        <div className="flex justify-end gap-4">
-          <Button variant="outline" type="button" onClick={() => navigate('/dashboard')}>
-            Cancel
-          </Button>
-          <Button type="submit">Save Invoice</Button>
+        <Button 
+          type="button" 
+          variant="ghost" 
+          onClick={handleAddItem}
+          className="mt-2 text-gray-500"
+        >
+          <Plus className="h-4 w-4 mr-2" /> Add item
+        </Button>
+      </div>
+      
+      {/* Invoice Totals */}
+      <div className="border-t border-gray-200 pt-4 mb-8">
+        <div className="flex justify-end mb-2">
+          <span className="w-32 text-gray-500">Subtotal</span>
+          <span className="w-32 text-right font-mono">{formatCurrency(calculateSubtotal())}</span>
         </div>
-      </form>
-    </Form>
+        <div className="flex justify-end mb-2">
+          <span className="w-32 text-gray-500">VAT (0%)</span>
+          <span className="w-32 text-right font-mono">{formatCurrency(calculateVat())}</span>
+        </div>
+        <div className="flex justify-end pt-2 border-t border-gray-200">
+          <span className="w-32 text-gray-700 font-medium">Total</span>
+          <span className="w-32 text-right font-mono text-xl font-bold">{formatCurrency(calculateTotal())}</span>
+        </div>
+      </div>
+
+      {/* Payment Details and Notes */}
+      <div className="grid grid-cols-2 gap-8 mb-10">
+        <div>
+          <h2 className="text-sm text-gray-500 mb-2">Payment Details</h2>
+          <Input 
+            {...form.register('yourBankAccount')}
+            className="mb-1 h-7 border-0 p-0 bg-transparent focus-visible:ring-0" 
+          />
+          <Input 
+            {...form.register('yourIban')}
+            className="mb-1 h-7 border-0 p-0 bg-transparent focus-visible:ring-0" 
+          />
+          <Input 
+            {...form.register('yourBic')}
+            className="mb-1 h-7 border-0 p-0 bg-transparent focus-visible:ring-0" 
+          />
+          <Input 
+            {...form.register('yourBank')}
+            className="mb-1 h-7 border-0 p-0 bg-transparent focus-visible:ring-0" 
+          />
+        </div>
+        <div>
+          <h2 className="text-sm text-gray-500 mb-2">Note</h2>
+          <Textarea 
+            {...form.register('notes')}
+            className="h-32 bg-gray-50 border-gray-200" 
+            placeholder="Additional notes for the customer..."
+          />
+        </div>
+      </div>
+
+      {/* Submit Button */}
+      <div className="flex justify-end gap-4">
+        <Button 
+          type="button" 
+          variant="outline" 
+          onClick={() => navigate('/dashboard')}
+        >
+          Cancel
+        </Button>
+        <Button type="submit" className="px-8">
+          Create
+        </Button>
+      </div>
+    </form>
   );
 };
 
