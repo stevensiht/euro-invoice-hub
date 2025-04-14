@@ -3,7 +3,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, MoreVertical } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import InvoiceForm from '@/components/invoices/InvoiceForm';
 
 const InvoiceCreate: React.FC = () => {
@@ -17,9 +17,6 @@ const InvoiceCreate: React.FC = () => {
               <ChevronLeft className="mr-2 h-4 w-4" />
               Back
             </Link>
-          </Button>
-          <Button variant="ghost" className="rounded-full p-2" size="icon">
-            <MoreVertical className="h-5 w-5" />
           </Button>
         </div>
         

@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { format } from 'date-fns';
-import { Plus, Minus } from 'lucide-react';
+import { Plus, Minus, Upload, X } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 type InvoiceItem = {
   id: string;
@@ -54,6 +55,9 @@ const InvoiceForm: React.FC = () => {
       unitPrice: 0,
     },
   ]);
+
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [showRemoveButton, setShowRemoveButton] = useState(false);
 
   const form = useForm<InvoiceFormData>({
     defaultValues: {
@@ -110,8 +114,20 @@ const InvoiceForm: React.FC = () => {
     return calculateSubtotal() + calculateVat();
   };
 
+  const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const fileUrl = URL.createObjectURL(file);
+      setLogoUrl(fileUrl);
+    }
+  };
+
+  const removeLogo = () => {
+    setLogoUrl(null);
+  };
+
   const onSubmit = (data: InvoiceFormData) => {
-    console.log('Form data submitted:', { ...data, items });
+    console.log('Form data submitted:', { ...data, items, logoUrl });
     // In a real app, we would save the invoice here
     
     // Navigate back to dashboard after mock submission
@@ -148,11 +164,38 @@ const InvoiceForm: React.FC = () => {
             </div>
           </div>
         </div>
-        <div className="flex items-center">
-          <div className="text-2xl font-bold text-teal-600">
-            Pezito<span className="text-green-400">24</span>
-          </div>
-          <div className="ml-1 h-12 w-12 rounded-full border-4 border-yellow-300"></div>
+
+        <div className="relative group">
+          {logoUrl ? (
+            <div 
+              className="relative h-20 w-20 rounded-md overflow-hidden"
+              onMouseEnter={() => setShowRemoveButton(true)}
+              onMouseLeave={() => setShowRemoveButton(false)}
+            >
+              <img src={logoUrl} alt="Company logo" className="h-full w-full object-contain" />
+              {showRemoveButton && (
+                <div 
+                  className="absolute inset-0 flex items-center justify-center bg-black/50 cursor-pointer"
+                  onClick={removeLogo}
+                >
+                  <X className="h-6 w-6 text-white" />
+                  <span className="text-white text-xs">Remove</span>
+                </div>
+              )}
+            </div>
+          ) : (
+            <label htmlFor="logo-upload" className="flex flex-col items-center justify-center w-20 h-20 border-2 border-dashed border-gray-300 rounded-md cursor-pointer hover:bg-gray-50">
+              <Upload className="h-6 w-6 text-gray-400" />
+              <span className="mt-1 text-xs text-gray-500">Add logo</span>
+            </label>
+          )}
+          <input 
+            id="logo-upload"
+            type="file"
+            accept="image/*"
+            onChange={handleLogoUpload}
+            className="hidden"
+          />
         </div>
       </div>
 
@@ -160,39 +203,41 @@ const InvoiceForm: React.FC = () => {
       <div className="grid grid-cols-2 gap-8 mb-10">
         <div>
           <h2 className="text-sm text-gray-500 mb-2">From</h2>
-          <Input 
-            {...form.register('yourCompanyName')}
-            className="mb-1 h-7 border-0 p-0 bg-transparent focus-visible:ring-0 font-medium" 
-            placeholder="Your Company Name" 
-          />
-          <Input 
-            {...form.register('yourCompanyAddress')}
-            className="mb-1 h-7 border-0 p-0 bg-transparent focus-visible:ring-0" 
-            placeholder="Street Address" 
-          />
-          <Input 
-            className="mb-1 h-7 border-0 p-0 bg-transparent focus-visible:ring-0" 
-            placeholder="13516 Tallinn" 
-          />
-          <Input 
-            className="mb-1 h-7 border-0 p-0 bg-transparent focus-visible:ring-0" 
-            placeholder="Estonia" 
-          />
-          <div className="mt-3">
-            <div className="flex">
-              <span className="w-14 text-sm text-gray-500">Reg:</span>
-              <Input 
-                className="h-6 p-0 border-0 bg-transparent focus-visible:ring-0" 
-                placeholder="14882759" 
-              />
-            </div>
-            <div className="flex">
-              <span className="w-14 text-sm text-gray-500">VAT #:</span>
-              <Input 
-                {...form.register('customerVat')}
-                className="h-6 p-0 border-0 bg-transparent focus-visible:ring-0" 
-                placeholder="EE102231175" 
-              />
+          <div className="space-y-1">
+            <Input 
+              {...form.register('yourCompanyName')}
+              className="h-7 border-0 p-0 bg-transparent focus-visible:ring-0 font-medium text-left" 
+              placeholder="Your Company Name" 
+            />
+            <Input 
+              {...form.register('yourCompanyAddress')}
+              className="h-7 border-0 p-0 bg-transparent focus-visible:ring-0 text-left" 
+              placeholder="Street Address" 
+            />
+            <Input 
+              className="h-7 border-0 p-0 bg-transparent focus-visible:ring-0 text-left" 
+              placeholder="13516 Tallinn" 
+            />
+            <Input 
+              className="h-7 border-0 p-0 bg-transparent focus-visible:ring-0 text-left" 
+              placeholder="Estonia" 
+            />
+            <div className="mt-3">
+              <div className="flex">
+                <span className="w-14 text-sm text-gray-500">Reg:</span>
+                <Input 
+                  className="h-6 p-0 border-0 bg-transparent focus-visible:ring-0 text-left" 
+                  placeholder="14882759" 
+                />
+              </div>
+              <div className="flex">
+                <span className="w-14 text-sm text-gray-500">VAT #:</span>
+                <Input 
+                  {...form.register('customerVat')}
+                  className="h-6 p-0 border-0 bg-transparent focus-visible:ring-0 text-left" 
+                  placeholder="EE102231175" 
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -296,22 +341,24 @@ const InvoiceForm: React.FC = () => {
       <div className="grid grid-cols-2 gap-8 mb-10">
         <div>
           <h2 className="text-sm text-gray-500 mb-2">Payment Details</h2>
-          <Input 
-            {...form.register('yourBankAccount')}
-            className="mb-1 h-7 border-0 p-0 bg-transparent focus-visible:ring-0" 
-          />
-          <Input 
-            {...form.register('yourIban')}
-            className="mb-1 h-7 border-0 p-0 bg-transparent focus-visible:ring-0" 
-          />
-          <Input 
-            {...form.register('yourBic')}
-            className="mb-1 h-7 border-0 p-0 bg-transparent focus-visible:ring-0" 
-          />
-          <Input 
-            {...form.register('yourBank')}
-            className="mb-1 h-7 border-0 p-0 bg-transparent focus-visible:ring-0" 
-          />
+          <div className="space-y-1">
+            <Input 
+              {...form.register('yourBankAccount')}
+              className="h-7 border-0 p-0 bg-transparent focus-visible:ring-0 text-left" 
+            />
+            <Input 
+              {...form.register('yourIban')}
+              className="h-7 border-0 p-0 bg-transparent focus-visible:ring-0 text-left" 
+            />
+            <Input 
+              {...form.register('yourBic')}
+              className="h-7 border-0 p-0 bg-transparent focus-visible:ring-0 text-left" 
+            />
+            <Input 
+              {...form.register('yourBank')}
+              className="h-7 border-0 p-0 bg-transparent focus-visible:ring-0 text-left" 
+            />
+          </div>
         </div>
         <div>
           <h2 className="text-sm text-gray-500 mb-2">Note</h2>
