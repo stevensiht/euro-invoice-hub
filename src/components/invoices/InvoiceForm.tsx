@@ -26,8 +26,7 @@ type InvoiceFormData = {
   issueDate: string;
   dueDate: string;
   notes: string;
-  yourCompanyName: string;
-  yourCompanyAddress: string;
+  yourCompanyInfo: string;
   yourBankAccount: string;
   yourIban: string;
   yourBic: string;
@@ -64,8 +63,7 @@ const InvoiceForm: React.FC = () => {
       invoiceNumber: 'INV-1016',
       issueDate: today,
       dueDate: nextMonth,
-      yourCompanyName: 'Adfinea OÜ',
-      yourCompanyAddress: 'Rannamõisa tee 5a',
+      yourCompanyInfo: 'Adfinea OÜ\nRannamõisa tee 5a\n13516 Tallinn\nEstonia\n\nReg: 14882759\nVAT #: EE102231175',
       yourBankAccount: 'Account holder: Adfinea OÜ',
       yourIban: 'IBAN: EE4977007710046243399',
       yourBic: 'BIC/SWIFT: LHVBEE22',
@@ -203,43 +201,10 @@ const InvoiceForm: React.FC = () => {
       <div className="grid grid-cols-2 gap-8 mb-10">
         <div>
           <h2 className="text-sm text-gray-500 mb-2">From</h2>
-          <div className="space-y-1">
-            <Input 
-              {...form.register('yourCompanyName')}
-              className="h-7 border-0 p-0 bg-transparent focus-visible:ring-0 font-medium text-left" 
-              placeholder="Your Company Name" 
-            />
-            <Input 
-              {...form.register('yourCompanyAddress')}
-              className="h-7 border-0 p-0 bg-transparent focus-visible:ring-0 text-left" 
-              placeholder="Street Address" 
-            />
-            <Input 
-              className="h-7 border-0 p-0 bg-transparent focus-visible:ring-0 text-left" 
-              placeholder="13516 Tallinn" 
-            />
-            <Input 
-              className="h-7 border-0 p-0 bg-transparent focus-visible:ring-0 text-left" 
-              placeholder="Estonia" 
-            />
-            <div className="mt-3">
-              <div className="flex">
-                <span className="w-14 text-sm text-gray-500">Reg:</span>
-                <Input 
-                  className="h-6 p-0 border-0 bg-transparent focus-visible:ring-0 text-left" 
-                  placeholder="14882759" 
-                />
-              </div>
-              <div className="flex">
-                <span className="w-14 text-sm text-gray-500">VAT #:</span>
-                <Input 
-                  {...form.register('customerVat')}
-                  className="h-6 p-0 border-0 bg-transparent focus-visible:ring-0 text-left" 
-                  placeholder="EE102231175" 
-                />
-              </div>
-            </div>
-          </div>
+          <Textarea 
+            {...form.register('yourCompanyInfo')}
+            className="min-h-[180px] resize-none border-0 p-0 bg-transparent focus-visible:ring-0"
+          />
         </div>
         <div>
           <h2 className="text-sm text-gray-500 mb-2">To</h2>
