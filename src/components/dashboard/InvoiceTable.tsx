@@ -18,7 +18,23 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Invoice, InvoiceStatus } from '@/lib/types';
-import { Eye } from 'lucide-react';
+import { 
+  Eye, 
+  PenLine, 
+  MoreVertical,
+  CheckCircle,
+  Calendar,
+  XCircle,
+  Clock,
+  FileEdit
+} from 'lucide-react';
+import { format } from 'date-fns';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface InvoiceTableProps {
   invoices: Invoice[];
@@ -32,6 +48,29 @@ const getStatusColor = (status: InvoiceStatus): string => {
     case 'overdue': return 'bg-invoice-overdue text-white';
     case 'cancelled': return 'bg-gray-500 text-white';
     default: return '';
+  }
+};
+
+const formatCurrency = (amount: number): string => {
+  return new Intl.NumberFormat('de-DE', {
+    style: 'currency',
+    currency: 'EUR',
+    minimumFractionDigits: 2,
+  }).format(amount);
+};
+
+const formatDate = (dateString: string): string => {
+  return format(new Date(dateString), 'dd/MM/yyyy');
+};
+
+const getStatusIcon = (status: InvoiceStatus) => {
+  switch (status) {
+    case 'draft': return <FileEdit className="mr-2 h-4 w-4" />;
+    case 'pending': return <Clock className="mr-2 h-4 w-4" />;
+    case 'paid': return <CheckCircle className="mr-2 h-4 w-4" />;
+    case 'overdue': return <Calendar className="mr-2 h-4 w-4" />;
+    case 'cancelled': return <XCircle className="mr-2 h-4 w-4" />;
+    default: return null;
   }
 };
 
@@ -63,21 +102,38 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ invoices }) => {
                   </Link>
                 </TableCell>
                 <TableCell>{invoice.customer.name}</TableCell>
-                <TableCell>{new Date(invoice.issueDate).toLocaleDateString()}</TableCell>
-                <TableCell>{new Date(invoice.dueDate).toLocaleDateString()}</TableCell>
-                <TableCell>€{invoice.total.toFixed(2)}</TableCell>
+                <TableCell>{formatDate(invoice.issueDate)}</TableCell>
+                <TableCell>{formatDate(invoice.dueDate)}</TableCell>
+                <TableCell>{formatCurrency(invoice.total)}</TableCell>
                 <TableCell>
                   <Badge className={getStatusColor(invoice.status)}>
                     {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
                   </Badge>
                 </TableCell>
                 <TableCell className="text-right">
-                  <Button variant="ghost" size="icon" asChild>
-                    <Link to={`/invoice/${invoice.id}`}>
-                      <Eye className="h-4 w-4" />
-                      <span className="sr-only">View</span>
-                    </Link>
-                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon">
+                        <MoreVertical className="h-4 w-4" />
+                        <span className="sr-only">Open menu</span>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="bg-white">
+                      <DropdownMenuItem asChild>
+                        <Link to={`/invoice/${invoice.id}`} className="flex items-center cursor-pointer">
+                          <Eye className="mr-2 h-4 w-4" /> View
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to={`/invoice/edit/${invoice.id}`} className="flex items-center cursor-pointer">
+                          <PenLine className="mr-2 h-4 w-4" /> Edit
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem className="flex items-center cursor-pointer">
+                        {getStatusIcon(invoice.status)} Change Status
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </TableCell>
               </TableRow>
             ))}

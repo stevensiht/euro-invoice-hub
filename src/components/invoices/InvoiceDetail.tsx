@@ -19,6 +19,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Invoice, InvoiceStatus } from '@/lib/types';
 import { Download, Send, Printer } from 'lucide-react';
+import { format } from 'date-fns';
 
 interface InvoiceDetailProps {
   invoice: Invoice;
@@ -35,6 +36,18 @@ const getStatusColor = (status: InvoiceStatus): string => {
   }
 };
 
+const formatCurrency = (amount: number): string => {
+  return new Intl.NumberFormat('de-DE', {
+    style: 'currency',
+    currency: 'EUR',
+    minimumFractionDigits: 2,
+  }).format(amount);
+};
+
+const formatDate = (dateString: string): string => {
+  return format(new Date(dateString), 'dd/MM/yyyy');
+};
+
 const InvoiceDetail: React.FC<InvoiceDetailProps> = ({ invoice }) => {
   return (
     <div className="space-y-6">
@@ -42,7 +55,7 @@ const InvoiceDetail: React.FC<InvoiceDetailProps> = ({ invoice }) => {
         <div>
           <h1 className="text-3xl font-bold">Invoice {invoice.invoiceNumber}</h1>
           <p className="text-muted-foreground">
-            Issued on {new Date(invoice.issueDate).toLocaleDateString()}
+            Issued on {formatDate(invoice.issueDate)}
           </p>
         </div>
         <div className="flex gap-2">
@@ -76,7 +89,7 @@ const InvoiceDetail: React.FC<InvoiceDetailProps> = ({ invoice }) => {
               </div>
               <div>
                 <p className="text-sm font-medium">Due Date</p>
-                <p>{new Date(invoice.dueDate).toLocaleDateString()}</p>
+                <p>{formatDate(invoice.dueDate)}</p>
               </div>
             </div>
           </CardContent>
@@ -117,9 +130,9 @@ const InvoiceDetail: React.FC<InvoiceDetailProps> = ({ invoice }) => {
                 <TableRow key={item.id}>
                   <TableCell>{item.description}</TableCell>
                   <TableCell className="text-right">{item.quantity}</TableCell>
-                  <TableCell className="text-right">€{item.unitPrice.toFixed(2)}</TableCell>
+                  <TableCell className="text-right">{formatCurrency(item.unitPrice)}</TableCell>
                   <TableCell className="text-right">{item.taxRate}%</TableCell>
-                  <TableCell className="text-right">€{item.total.toFixed(2)}</TableCell>
+                  <TableCell className="text-right">{formatCurrency(item.total)}</TableCell>
                 </TableRow>
               ))}
               <TableRow>
@@ -127,7 +140,7 @@ const InvoiceDetail: React.FC<InvoiceDetailProps> = ({ invoice }) => {
                   Subtotal
                 </TableCell>
                 <TableCell className="text-right font-medium">
-                  €{invoice.subtotal.toFixed(2)}
+                  {formatCurrency(invoice.subtotal)}
                 </TableCell>
               </TableRow>
               <TableRow>
@@ -135,7 +148,7 @@ const InvoiceDetail: React.FC<InvoiceDetailProps> = ({ invoice }) => {
                   Tax
                 </TableCell>
                 <TableCell className="text-right font-medium">
-                  €{invoice.tax.toFixed(2)}
+                  {formatCurrency(invoice.tax)}
                 </TableCell>
               </TableRow>
               <TableRow>
@@ -143,7 +156,7 @@ const InvoiceDetail: React.FC<InvoiceDetailProps> = ({ invoice }) => {
                   Total
                 </TableCell>
                 <TableCell className="text-right text-lg font-bold">
-                  €{invoice.total.toFixed(2)}
+                  {formatCurrency(invoice.total)}
                 </TableCell>
               </TableRow>
             </TableBody>
