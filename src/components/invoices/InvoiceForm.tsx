@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -96,7 +95,6 @@ const InvoiceForm: React.FC = () => {
   };
 
   const handleQuantityChange = (id: string, value: string) => {
-    // Allow empty strings for editing purposes, but convert to 0 when processing
     const numericValue = value === '' ? 0 : parseInt(value) || 0;
     handleChangeItem(id, 'quantity', numericValue);
   };
@@ -122,7 +120,6 @@ const InvoiceForm: React.FC = () => {
   };
 
   const calculateVat = (): number => {
-    // Assuming 0% VAT for now
     return 0;
   };
 
@@ -142,17 +139,18 @@ const InvoiceForm: React.FC = () => {
     setLogoUrl(null);
   };
 
+  const handlePriceChange = (id: string, value: string) => {
+    const numericValue = value === '' ? 0 : parseFloat(value) || 0;
+    handleChangeItem(id, 'unitPrice', numericValue);
+  };
+
   const onSubmit = (data: InvoiceFormData) => {
     console.log('Form data submitted:', { ...data, items, logoUrl });
-    // In a real app, we would save the invoice here
-    
-    // Navigate back to dashboard after mock submission
     navigate('/dashboard');
   };
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="bg-white rounded-lg p-8 shadow-sm">
-      {/* Invoice Header */}
       <div className="flex justify-between items-start mb-8">
         <div>
           <h1 className="text-3xl font-bold mb-4">Invoice</h1>
@@ -215,7 +213,6 @@ const InvoiceForm: React.FC = () => {
         </div>
       </div>
 
-      {/* From/To Section */}
       <div className="grid grid-cols-2 gap-8 mb-10">
         <div>
           <h2 className="text-sm text-gray-500 mb-2">From</h2>
@@ -232,7 +229,6 @@ const InvoiceForm: React.FC = () => {
         </div>
       </div>
 
-      {/* Invoice Items */}
       <div className="mb-8">
         <div className="grid grid-cols-12 gap-4 mb-2 text-sm text-gray-500">
           <div className="col-span-5">Description</div>
@@ -282,11 +278,11 @@ const InvoiceForm: React.FC = () => {
             <div className="col-span-2">
               <Input
                 value={item.unitPrice}
-                onChange={(e) => handleChangeItem(item.id, 'unitPrice', parseFloat(e.target.value) || 0)}
+                onChange={(e) => handlePriceChange(item.id, e.target.value)}
                 className="text-right"
-                type="number"
-                step="0.01"
-                min="0"
+                type="text"
+                inputMode="decimal"
+                pattern="[0-9]*[.,]?[0-9]*"
               />
             </div>
             <div className="col-span-2 text-right font-mono">
@@ -305,7 +301,6 @@ const InvoiceForm: React.FC = () => {
         </Button>
       </div>
       
-      {/* Invoice Totals */}
       <div className="border-t border-gray-200 pt-4 mb-8">
         <div className="flex justify-end mb-2">
           <span className="w-32 text-gray-500">Subtotal</span>
@@ -321,7 +316,6 @@ const InvoiceForm: React.FC = () => {
         </div>
       </div>
 
-      {/* Payment Details and Notes */}
       <div className="grid grid-cols-2 gap-8 mb-10">
         <div>
           <h2 className="text-sm text-gray-500 mb-2">Payment Details</h2>
@@ -354,7 +348,6 @@ const InvoiceForm: React.FC = () => {
         </div>
       </div>
 
-      {/* Submit Button */}
       <div className="flex justify-end gap-4">
         <Button 
           type="button" 
