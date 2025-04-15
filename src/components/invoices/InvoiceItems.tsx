@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Plus, Minus } from 'lucide-react';
+import { Plus, Minus, X } from 'lucide-react';
 
 export type InvoiceItem = {
   id: string;
@@ -45,13 +45,16 @@ const InvoiceItems: React.FC<InvoiceItemsProps> = ({
         <div className="col-span-2 text-right">Total</div>
       </div>
       
-      {items.map((item) => (
-        <div key={item.id} className="grid grid-cols-12 gap-4 mb-4 items-center">
+      {items.map((item, index) => (
+        <div 
+          key={item.id} 
+          className="grid grid-cols-12 gap-4 mb-4 items-center group relative"
+        >
           <div className="col-span-5">
             <Input
               value={item.description}
               onChange={(e) => onChangeItem(item.id, 'description', e.target.value)}
-              className="w-full"
+              className="w-full border-none border-b border-gray-200 focus:border-b-gray-900 focus:ring-0 rounded-none bg-transparent px-0 text-gray-700 placeholder:text-gray-400"
               placeholder="Item description"
             />
           </div>
@@ -60,15 +63,15 @@ const InvoiceItems: React.FC<InvoiceItemsProps> = ({
               type="button" 
               variant="outline" 
               size="icon" 
-              className="h-8 w-8 rounded-full"
+              className="h-8 w-8 rounded-full border-gray-300"
               onClick={() => decrementQuantity(item.id)}
             >
-              <Minus className="h-3 w-3" />
+              <Minus className="h-3 w-3 text-gray-500" />
             </Button>
             <Input
               value={item.quantity === 0 ? '' : item.quantity.toString()}
               onChange={(e) => onQuantityChange(item.id, e.target.value)}
-              className="w-16 text-center mx-2"
+              className="w-16 text-center mx-2 border-none border-b border-gray-200 focus:border-b-gray-900 focus:ring-0 rounded-none bg-transparent px-0"
               type="text"
               inputMode="numeric"
               pattern="[0-9]*"
@@ -77,24 +80,39 @@ const InvoiceItems: React.FC<InvoiceItemsProps> = ({
               type="button" 
               variant="outline" 
               size="icon" 
-              className="h-8 w-8 rounded-full"
+              className="h-8 w-8 rounded-full border-gray-300"
               onClick={() => incrementQuantity(item.id)}
             >
-              <Plus className="h-3 w-3" />
+              <Plus className="h-3 w-3 text-gray-500" />
             </Button>
           </div>
           <div className="col-span-2">
             <Input
               value={item.unitPrice === 0 ? '' : item.unitPrice}
               onChange={(e) => onPriceChange(item.id, e.target.value)}
-              className="text-right"
+              className="text-right border-none border-b border-gray-200 focus:border-b-gray-900 focus:ring-0 rounded-none bg-transparent px-0"
               type="text"
               inputMode="decimal"
               pattern="[0-9]*[.,]?[0-9]*"
             />
           </div>
-          <div className="col-span-2 text-right font-mono">
-            {formatCurrency(calculateItemTotal(item))}
+          <div className="col-span-2 text-right font-mono relative">
+            <div className="flex items-center justify-end">
+              <span>{formatCurrency(calculateItemTotal(item))}</span>
+              
+              {index > 0 && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => onRemoveItem(item.id)}
+                  className="h-6 w-6 p-0.5 ml-2 opacity-0 group-hover:opacity-100 transition-opacity rounded-full text-gray-400 hover:text-red-500 hover:bg-gray-100"
+                  aria-label="Remove item"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       ))}
