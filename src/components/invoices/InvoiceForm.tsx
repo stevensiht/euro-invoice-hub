@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -91,6 +92,24 @@ const InvoiceForm: React.FC = () => {
   const handleChangeItem = (id: string, field: keyof InvoiceItem, value: string | number) => {
     setItems(items.map(item => 
       item.id === id ? { ...item, [field]: value } : item
+    ));
+  };
+
+  const handleQuantityChange = (id: string, value: string) => {
+    // Allow empty strings for editing purposes, but convert to 0 when processing
+    const numericValue = value === '' ? 0 : parseInt(value) || 0;
+    handleChangeItem(id, 'quantity', numericValue);
+  };
+
+  const incrementQuantity = (id: string) => {
+    setItems(items.map(item => 
+      item.id === id ? { ...item, quantity: item.quantity + 1 } : item
+    ));
+  };
+
+  const decrementQuantity = (id: string) => {
+    setItems(items.map(item => 
+      item.id === id ? { ...item, quantity: Math.max(0, item.quantity - 1) } : item
     ));
   };
 
@@ -238,23 +257,24 @@ const InvoiceForm: React.FC = () => {
                 variant="outline" 
                 size="icon" 
                 className="h-8 w-8 rounded-full"
-                onClick={() => handleChangeItem(item.id, 'quantity', Math.max(1, item.quantity - 1))}
+                onClick={() => decrementQuantity(item.id)}
               >
                 <Minus className="h-3 w-3" />
               </Button>
               <Input
-                value={item.quantity}
-                onChange={(e) => handleChangeItem(item.id, 'quantity', parseInt(e.target.value) || 1)}
+                value={item.quantity === 0 ? '' : item.quantity.toString()}
+                onChange={(e) => handleQuantityChange(item.id, e.target.value)}
                 className="w-16 text-center mx-2"
-                type="number"
-                min="1"
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
               />
               <Button 
                 type="button" 
                 variant="outline" 
                 size="icon" 
                 className="h-8 w-8 rounded-full"
-                onClick={() => handleChangeItem(item.id, 'quantity', item.quantity + 1)}
+                onClick={() => incrementQuantity(item.id)}
               >
                 <Plus className="h-3 w-3" />
               </Button>
