@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -139,25 +138,25 @@ const InvoiceForm: React.FC = () => {
         <div>
           <h1 className="text-3xl font-bold mb-4">Invoice</h1>
           <div className="space-y-1 text-sm text-gray-600">
-            <div className="flex">
-              <span className="w-28">Invoice No:</span>
+            <div className="flex items-center">
+              <span className="w-28 font-medium">Invoice No:</span>
               <Input 
                 {...form.register('invoiceNumber')}
-                className="h-6 p-0 border-0 bg-transparent focus-visible:ring-0 text-black" 
+                className="h-8 p-0 border-0 bg-transparent focus-visible:ring-0 text-black" 
               />
             </div>
-            <div className="flex">
-              <span className="w-28">Issue Date:</span>
+            <div className="flex items-center">
+              <span className="w-28 font-medium">Issue Date:</span>
               <Input 
                 {...form.register('issueDate')}
-                className="h-6 p-0 border-0 bg-transparent focus-visible:ring-0 text-black" 
+                className="h-8 p-0 border-0 bg-transparent focus-visible:ring-0 text-black" 
               />
             </div>
-            <div className="flex">
-              <span className="w-28">Due Date:</span>
+            <div className="flex items-center">
+              <span className="w-28 font-medium">Due Date:</span>
               <Input 
                 {...form.register('dueDate')}
-                className="h-6 p-0 border-0 bg-transparent focus-visible:ring-0 text-black" 
+                className="h-8 p-0 border-0 bg-transparent focus-visible:ring-0 text-black" 
               />
             </div>
           </div>
