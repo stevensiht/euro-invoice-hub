@@ -31,6 +31,11 @@ type InvoiceFormData = {
   yourBank: string;
 };
 
+interface InvoiceFormProps {
+  onFormSubmit: (data: any) => Promise<void>;
+  isGeneratingPDF?: boolean;
+}
+
 const formatCurrency = (amount: number): string => {
   return new Intl.NumberFormat('de-DE', {
     style: 'currency',
@@ -39,7 +44,7 @@ const formatCurrency = (amount: number): string => {
   }).format(amount);
 };
 
-const InvoiceForm: React.FC = () => {
+const InvoiceForm: React.FC<InvoiceFormProps> = ({ onFormSubmit, isGeneratingPDF = false }) => {
   const navigate = useNavigate();
   const today = format(new Date(), 'dd/MM/yyyy');
   const nextMonth = format(new Date(new Date().setMonth(new Date().getMonth() + 1)), 'dd/MM/yyyy');
@@ -66,6 +71,8 @@ const InvoiceForm: React.FC = () => {
       yourBic: 'BIC/SWIFT: LHVBEE22',
       yourBank: 'Bank: AS LHV Pank',
       notes: '',
+      customerName: '',
+      customerAddress: '',
     },
   });
 
@@ -131,9 +138,16 @@ const InvoiceForm: React.FC = () => {
     handleChangeItem(id, 'unitPrice', numericValue);
   };
 
-  const onSubmit = (data: InvoiceFormData) => {
-    console.log('Form data submitted:', { ...data, items, logoUrl });
-    navigate('/dashboard');
+  const onSubmit = async (data: InvoiceFormData) => {
+    // Combine form data with items and logoUrl
+    const formData = {
+      ...data,
+      items,
+      logoUrl
+    };
+    
+    // Pass data to parent component for PDF generation
+    await onFormSubmit(formData);
   };
 
   return (
@@ -194,7 +208,11 @@ const InvoiceForm: React.FC = () => {
         />
       </div>
 
-      <FormActions onCancel={() => navigate('/dashboard')} />
+      <FormActions 
+        onCancel={() => navigate('/dashboard')} 
+        isSubmitting={isGeneratingPDF}
+        isCreating={isGeneratingPDF}
+      />
     </form>
   );
 };
