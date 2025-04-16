@@ -10,11 +10,11 @@ const InvoiceCreate: React.FC = () => {
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
-      <div className="flex-1 p-8 pt-6">
+      <div className="flex-1 p-6 pt-4">
         <div className="flex items-center justify-between mb-6">
-          <Button variant="outline" asChild>
+          <Button variant="outline" asChild size="sm">
             <Link to="/dashboard">
-              <ChevronLeft className="mr-2 h-4 w-4" />
+              <ChevronLeft className="mr-2 h-3 w-3" />
               Back
             </Link>
           </Button>

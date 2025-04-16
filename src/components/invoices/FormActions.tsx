@@ -11,12 +11,13 @@ const FormActions: React.FC<FormActionsProps> = ({ onCancel }) => {
     <div className="flex justify-end gap-4">
       <Button 
         type="button" 
-        variant="outline" 
+        variant="outline"
+        size="sm"
         onClick={onCancel}
       >
         Cancel
       </Button>
-      <Button type="submit" className="px-8">
+      <Button type="submit" size="sm" className="px-6">
         Create
       </Button>
     </div>

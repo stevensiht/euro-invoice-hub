@@ -9,12 +9,12 @@ interface CustomerNotesProps {
 
 const CustomerNotes: React.FC<CustomerNotesProps> = ({ notes, onNotesChange }) => {
   return (
-    <div>
-      <h2 className="text-sm text-gray-500 mb-2">Note</h2>
+    <div className="text-sm">
+      <h2 className="text-xs text-gray-500 mb-2">Note</h2>
       <Textarea 
         value={notes}
         onChange={(e) => onNotesChange(e.target.value)}
-        className="h-32 bg-gray-50 border-gray-200" 
+        className="h-28 bg-gray-50 border-gray-200 text-sm" 
         placeholder="Additional notes for the customer..."
       />
     </div>
