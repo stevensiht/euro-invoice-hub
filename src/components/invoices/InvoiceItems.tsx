@@ -59,7 +59,7 @@ const InvoiceItems: React.FC<InvoiceItemsProps> = ({
               onChange={(e) => onChangeItem(item.id, 'description', e.target.value)}
               className={`w-full border-none border-b border-gray-300 ${
                 focusedField === `description-${item.id}` ? 'border-b-black' : 'border-b-gray-300'
-              } focus:border-b-black focus:ring-0 rounded-none bg-transparent px-0 text-gray-700 placeholder:text-gray-400 text-xs h-8`}
+              } focus:ring-0 focus:outline-none rounded-none bg-transparent px-0 text-gray-700 placeholder:text-gray-400 text-xs h-8`}
               placeholder="Item description"
               onFocus={() => setFocusedField(`description-${item.id}`)}
               onBlur={() => setFocusedField(null)}
@@ -81,7 +81,7 @@ const InvoiceItems: React.FC<InvoiceItemsProps> = ({
               onChange={(e) => onQuantityChange(item.id, e.target.value)}
               className={`w-12 text-center mx-2 border-none ${
                 focusedField === `quantity-${item.id}` ? 'border-b-black' : 'border-b-gray-300'
-              } focus:border-b-black focus:ring-0 rounded-none bg-transparent px-0 text-xs h-8`}
+              } focus:ring-0 focus:outline-none rounded-none bg-transparent px-0 text-xs h-8`}
               type="text"
               inputMode="numeric"
               pattern="[0-9]*"
@@ -105,7 +105,7 @@ const InvoiceItems: React.FC<InvoiceItemsProps> = ({
               onChange={(e) => onPriceChange(item.id, e.target.value)}
               className={`text-right border-none ${
                 focusedField === `price-${item.id}` ? 'border-b-black' : 'border-b-gray-300'
-              } focus:border-b-black focus:ring-0 rounded-none bg-transparent px-0 text-xs h-8`}
+              } focus:ring-0 focus:outline-none rounded-none bg-transparent px-0 text-xs h-8`}
               type="text"
               inputMode="decimal"
               pattern="[0-9]*[.,]?[0-9]*"
@@ -114,7 +114,7 @@ const InvoiceItems: React.FC<InvoiceItemsProps> = ({
               style={{ borderBottom: focusedField === `price-${item.id}` ? '1px solid black' : '1px solid #8E9196' }}
             />
           </div>
-          <div className="col-span-2 flex items-center">
+          <div className="col-span-2 flex items-center justify-end">
             <span className="font-mono text-xs flex-1 text-right">{formatCurrency(calculateItemTotal(item))}</span>
             
             {/* Position the remove button outside the grid flow to avoid affecting alignment */}
